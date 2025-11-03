@@ -260,6 +260,46 @@ body {
   overflow: auto;
   position: relative;
 }
+
+/* On-screen scroll arrows overlay */
+.scroll-arrows {
+  position: sticky; /* stick within scroll container */
+  bottom: 12px;
+  grid-column: 2; /* place near right column where long content typically sits */
+  justify-self: end;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* do not block content except buttons themselves */
+}
+.scroll-arrow {
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(37,99,235,0.35);
+  background: rgba(255,255,255,0.9);
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+.scroll-arrow:hover,
+.scroll-arrow:focus-visible {
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.scroll-arrow:active {
+  transform: translateY(0);
+}
+
 .scroll-hint {
   opacity: 0.85;
 }

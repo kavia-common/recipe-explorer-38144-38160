@@ -284,11 +284,56 @@ function HomePage({ recipes, query, setQuery, onOpen, selectedIndex, setSelected
  * Recipe detail page
  */
 function RecipeDetail({ recipe, onBack }) {
+  // Ref to the scroll container to control it via buttons and keys
+  const [scrollEl, setScrollEl] = useState(null);
+
+  // Keyboard support for page-like vertical scrolls within detail
   useTizenKeys({
     onBack,
     onLeft: undefined,
     onRight: undefined,
+    onUp: () => {
+      if (scrollEl) {
+        scrollEl.scrollBy({ top: -200, behavior: 'smooth' });
+      }
+    },
+    onDown: () => {
+      if (scrollEl) {
+        scrollEl.scrollBy({ top: 200, behavior: 'smooth' });
+      }
+    },
   });
+
+  // PUBLIC_INTERFACE
+  // On-screen scroll controls for TV remotes without wheel support
+  function ScrollArrows({ target }) {
+    /** This renders fixed-position up/down arrows overlay.
+     *  - Click to scroll the target container smoothly.
+     *  - Positioned within the detail content pane.
+     */
+    if (!target) return null;
+    const scrollByDelta = (delta) => {
+      target.scrollBy({ top: delta, behavior: 'smooth' });
+    };
+    return (
+      <div className="scroll-arrows" aria-label="Scroll controls">
+        <button
+          className="scroll-arrow"
+          aria-label="Scroll up"
+          onClick={() => scrollByDelta(-200)}
+        >
+          ▲
+        </button>
+        <button
+          className="scroll-arrow"
+          aria-label="Scroll down"
+          onClick={() => scrollByDelta(200)}
+        >
+          ▼
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell" role="application" aria-label={`${recipe.title} details`}>
@@ -314,7 +359,11 @@ function RecipeDetail({ recipe, onBack }) {
             <div className="detail-title">{recipe.title}</div>
             <div className="detail-subtitle">Ingredients and step-by-step instructions</div>
           </div>
-          <div className="detail-sections scrollable" aria-label="Recipe sections">
+          <div
+            className="detail-sections scrollable"
+            aria-label="Recipe sections"
+            ref={setScrollEl}
+          >
             <div className="scroll-hint small text-muted" aria-hidden="true" style={{gridColumn: '1 / -1', textAlign: 'center', marginBottom: 6}}>
               ↓ Scroll for more ↓
             </div>
@@ -337,12 +386,14 @@ function RecipeDetail({ recipe, onBack }) {
                 ))}
               </div>
             </div>
+            {/* Overlay scroll arrows for visible on-screen controls */}
+            <ScrollArrows target={scrollEl} />
           </div>
         </section>
       </main>
 
       <footer className="app-footer small">
-        <div className="text-muted">Press Back to return to recipes.</div>
+        <div className="text-muted">Use Up/Down or on-screen arrows to scroll. Press Back to return.</div>
         <div className="text-muted">Ocean Professional</div>
       </footer>
     </div>
