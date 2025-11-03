@@ -4,30 +4,33 @@ import react from '@vitejs/plugin-react'
 /**
  * PUBLIC_INTERFACE
  * Vite configuration for Tizen TV dev server in containerized environments.
- * - Binds to 0.0.0.0 on port 3000
- * - Uses polling-based watcher with sane intervals to avoid CPU spikes/OOM in Docker
- * - Disables watching of env files to avoid restarts from external env management
- * - Configures HMR to work through container networking
+ * - Binds to 0.0.0.0 on port 3000 (strict)
+ * - Allows external preview host for reverse-proxy previews
+ * - Uses polling-based watcher to reduce CPU/memory in Docker/CI
+ * - Disables heavy HMR overlays and avoids reload storms
  */
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
     host: '0.0.0.0',
+    port: 3000,
     strictPort: true,
-    // Keep HMR lightweight in CI by disabling overlay, which spawns heavy error frames
+    // Allow the preview ingress host
+    allowedHosts: ['vscode-internal-22842-qa.qa01.cloud.kavia.ai'],
+    // Keep HMR lightweight and stable
     hmr: {
       overlay: false,
+      // Prefer websocket transport and avoid full reloads on small fs noise
+      server: undefined,
     },
     // File watcher tuning to prevent excessive restarts and memory usage
     watch: {
       usePolling: true,
-      interval: 700,
+      interval: 800,
       awaitWriteFinish: {
-        stabilityThreshold: 1000,
-        pollInterval: 250,
+        stabilityThreshold: 1200,
+        pollInterval: 300,
       },
-      // Only watch our working sources and entry HTML to reduce churn
       ignored: [
         '**/.env',
         '**/.env.*',
@@ -36,19 +39,28 @@ export default defineConfig({
         '**/post_process_status.lock',
         '**/node_modules/**',
         '**/dist/**',
+        '**/.git/**',
+        '**/.cache/**',
       ],
+    },
+    // Avoid automatic restarts on config change within CI (stability over agility)
+    // Note: Vite restarts when vite.config.* changes; minimize such writes in CI.
+  },
+  // Keep dependency optimization minimal for memory-constrained environments
+  optimizeDeps: {
+    include: [],
+    exclude: [],
+    force: false,
+    esbuildOptions: {
+      target: 'es2020',
     },
   },
   // Prevent env changes from causing hot reload storms
   envDir: '.',
-  // Keep dependency optimization minimal for memory-constrained environments
-  optimizeDeps: {
-    include: [],
-    exclude: [], // nothing to prebundle aggressively
-    force: false, // avoid re-optimizing on startup unless needed
-  },
   preview: {
-    port: 3000,
     host: '0.0.0.0',
+    port: 3000,
+    strictPort: true,
+    allowedHosts: ['vscode-internal-22842-qa.qa01.cloud.kavia.ai'],
   },
 })
