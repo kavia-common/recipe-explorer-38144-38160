@@ -315,6 +315,9 @@ function RecipeDetail({ recipe, onBack }) {
             <div className="detail-subtitle">Ingredients and step-by-step instructions</div>
           </div>
           <div className="detail-sections scrollable" aria-label="Recipe sections">
+            <div className="scroll-hint small text-muted" aria-hidden="true" style={{gridColumn: '1 / -1', textAlign: 'center', marginBottom: 6}}>
+              ↓ Scroll for more ↓
+            </div>
             <div className="panel" aria-label="Ingredients">
               <h3>Ingredients</h3>
               <ul className="list" aria-label="Ingredients list">

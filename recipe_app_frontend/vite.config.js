@@ -15,21 +15,17 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     strictPort: true,
-    hmr: {
-      host: '0.0.0.0',
-      port: 3000,
-      protocol: 'ws',
-    },
+    // Vite v5 HMR auto-detects; explicit port/host not required in container
     // File watcher tuning to prevent excessive restarts and memory usage
     watch: {
       usePolling: true,
-      interval: 300,
+      interval: 500,
       awaitWriteFinish: {
-        stabilityThreshold: 500,
-        pollInterval: 100,
+        stabilityThreshold: 800,
+        pollInterval: 200,
       },
-      // Ignore env files to prevent auto-restarts when external tooling touches them
-      ignored: ['**/.env', '**/.env.*'],
+      // Ignore env and lock/tmp files to prevent auto-restarts from external tooling
+      ignored: ['**/.env', '**/.env.*', '**/*.lock', '**/*.tmp', '**/post_process_status.lock'],
     },
   },
   // Prevent env changes from causing hot reload storms

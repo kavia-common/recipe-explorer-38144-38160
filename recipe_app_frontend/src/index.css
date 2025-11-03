@@ -258,6 +258,10 @@ body {
   gap: 12px;
   padding: 16px 16px 18px;
   overflow: auto;
+  position: relative;
+}
+.scroll-hint {
+  opacity: 0.85;
 }
 .panel {
   background: #fff;
