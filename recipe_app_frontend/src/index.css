@@ -264,35 +264,36 @@ body {
 /* On-screen scroll arrows overlay */
 .scroll-arrows {
   position: sticky; /* stick within scroll container */
-  bottom: 12px;
+  bottom: 16px;
   grid-column: 2; /* place near right column where long content typically sits */
   justify-self: end;
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   pointer-events: none; /* do not block content except buttons themselves */
 }
 .scroll-arrow {
   pointer-events: auto;
-  width: 44px;
-  height: 44px;
+  width: 64px;   /* larger hit area for TV remotes */
+  height: 64px;
   border-radius: 50%;
-  border: 1px solid rgba(37,99,235,0.35);
-  background: rgba(255,255,255,0.9);
+  border: 2px solid rgba(37,99,235,0.45);
+  background: rgba(255,255,255,0.95);
   color: var(--color-primary);
-  font-size: 20px;
+  font-size: 28px; /* larger icon */
   font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 .scroll-arrow:hover,
 .scroll-arrow:focus-visible {
   background: #ffffff;
+  border-color: rgba(37,99,235,0.65);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }

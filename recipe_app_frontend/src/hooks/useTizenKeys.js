@@ -1,5 +1,15 @@
 import { useEffect } from 'react';
 
+/**
+ * PUBLIC_INTERFACE
+ * useTizenKeys
+ * A lightweight keyboard/remote key handler for Tizen TV remotes.
+ * Pass a handlers object with optional callbacks: onLeft, onRight, onUp, onDown, onEnter, onBack.
+ *
+ * @param {{onLeft?:Function,onRight?:Function,onUp?:Function,onDown?:Function,onEnter?:Function,onBack?:Function}} handlers
+ *        Callback handlers invoked when corresponding key codes are received.
+ * @returns {void}
+ */
 export function useTizenKeys(handlers) {
   useEffect(() => {
     function handleKeyDown(e) {

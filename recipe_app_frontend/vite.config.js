@@ -5,9 +5,9 @@ import react from '@vitejs/plugin-react'
  * PUBLIC_INTERFACE
  * Vite configuration for Tizen TV dev server in containerized environments.
  * - Binds to 0.0.0.0 on port 3000 (strict)
- * - Allows external preview host for reverse-proxy previews
- * - Uses polling-based watcher to reduce CPU/memory in Docker/CI
- * - Disables heavy HMR overlays and avoids reload storms
+ * - Limits FS watching scope to reduce memory and restarts
+ * - Uses polling-based watcher tuned for Docker/CI
+ * - Disables overlay to avoid noisy reload storms
  */
 export default defineConfig({
   plugins: [react()],
@@ -15,21 +15,18 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
-    // Allow the preview ingress host
     allowedHosts: ['vscode-internal-22842-qa.qa01.cloud.kavia.ai'],
-    // Keep HMR lightweight and stable
     hmr: {
       overlay: false,
-      // Prefer websocket transport and avoid full reloads on small fs noise
       server: undefined,
     },
     // File watcher tuning to prevent excessive restarts and memory usage
     watch: {
       usePolling: true,
-      interval: 800,
+      interval: 1200, // slower polling to reduce CPU/memory
       awaitWriteFinish: {
-        stabilityThreshold: 1200,
-        pollInterval: 300,
+        stabilityThreshold: 1500,
+        pollInterval: 400,
       },
       ignored: [
         '**/.env',
@@ -41,10 +38,17 @@ export default defineConfig({
         '**/dist/**',
         '**/.git/**',
         '**/.cache/**',
+        '**/.vite/**',
       ],
     },
-    // Avoid automatic restarts on config change within CI (stability over agility)
-    // Note: Vite restarts when vite.config.* changes; minimize such writes in CI.
+    // Restrict filesystem scanning to the frontend container directory
+    fs: {
+      strict: true,
+      // allow only this container root
+      allow: ['.'],
+      // disallow following symlinks outside project to avoid large scans
+      followSymlinks: false,
+    },
   },
   // Keep dependency optimization minimal for memory-constrained environments
   optimizeDeps: {
@@ -55,7 +59,6 @@ export default defineConfig({
       target: 'es2020',
     },
   },
-  // Prevent env changes from causing hot reload storms
   envDir: '.',
   preview: {
     host: '0.0.0.0',
